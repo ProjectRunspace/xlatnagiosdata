@@ -1,0 +1,12 @@
+[Unit]
+Description=Nagios performance translation service 1.0
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/xlatnagiosdatad
+ExecReload=/usr/bin/kill -s HUP ${MAINPID}
+User=root
+
+[Install]
+WantedBy=multi-user.target

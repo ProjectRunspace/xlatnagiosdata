@@ -1,0 +1,4 @@
+.vscode/
+build/
+xlatnagiosdata
+*.tar.gz

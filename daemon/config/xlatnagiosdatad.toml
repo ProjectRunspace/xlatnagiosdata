@@ -1,0 +1,68 @@
+# xlatnagiosdata.toml: Configuration file for the xlatnagiosdata daemon
+
+# The daemon automatically uses defaults for any missing values.
+
+[logging]
+# enabled
+### Whether to enable logging. Default is true.
+# enabled = true
+
+# level
+### The logging level. Default is "info".
+### Possible values are "debug", "info", "warn", "error", and "fatal".
+# level = "info"
+
+# save_failed_writes
+### Whether to save failed writes to a file. Default is true.
+### After the daemon believes that it has successfully translated a performance record, it attempts to
+### upload it to the database. If that fails, if this value is true, the daemon attempts to write the record to /var/log/xlatnagiosdata/failed_writes.log.
+### If that fails, then it writes the record to syslog.
+### The value is automatically treated as false if logging is disabled.
+# save_failed_writes = true
+
+[daemon]
+# delay
+### The number of seconds to wait between checking for new performance files from Nagios. Default is 30.
+### The collector always runs at least once.
+# delay = 30
+
+[influx]
+# host
+### The hostname or IP address of the InfluxDB server. Default is "localhost".
+# host = "localhost"
+
+# database
+### The name of the InfluxDB database to write to. Default is "nagiosrecords".
+# database = "nagiosrecords"
+
+# measurement
+### The name of the InfluxDB measurement to write to. Default is "perfdata".
+# measurement = "perfdata"
+
+# port
+### The port number of the InfluxDB server. Default is 8086.
+# port = 8086
+
+[nagios]
+# spool_directory
+### The directory where Nagios writes performance data files. Default is "/usr/local/nagios/var/spool/xlatnagiosdata".
+# spool_directory = "/usr/local/nagios/var/spool/xlatnagiosdata"
+
+# create entries in unit_conversion_map to translate the units used by nagios into the units used by grafana
+# https://github.com/grafana/grafana/blob/main/packages/grafana-data/src/valueFormats/categories.ts
+[unit_conversion_map]
+"%" = "percent"
+"s" = "seconds"
+"b" = "bits"
+"B" = "bytes"
+"kB" = "deckbytes"
+"KB" = "deckbytes"
+"KiB" = "kbytes"
+"MB" = "decmbytes"
+"MiB" = "mbytes"
+"GB" = "decgbytes"
+"GiB" = "gbytes"
+"TB" = "dectbytes"
+"TiB" = "tbytes"
+"PB" = "decpbytes"
+"PiB" = "pbytes"
