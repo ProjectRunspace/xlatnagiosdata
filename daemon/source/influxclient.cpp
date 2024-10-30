@@ -97,6 +97,7 @@ void InfluxClient::TransmitNagiosLine(const NagiosPerformanceRecord &NagiosData,
 	{
 		WriteLineRequest.ClearQuery();
 		WriteLineRequest.AddQueryParameter(InfluxDatabaseParameter, DatabaseName);
+		WriteLineRequest.AddQueryParameter("precision", "s");
 		WriteLineRequest.SetPostData(std::move(line));
 		auto WriteResult{Curl.Post(WriteLineRequest)};
 		if (LogInfluxError(WriteResult, Log, Write))
