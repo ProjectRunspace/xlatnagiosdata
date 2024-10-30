@@ -10,7 +10,6 @@ struct PendingFile
 	PendingFile(std::string FileName, size_t FileSize) : FileName{FileName}, FileSize{FileSize} {}
 	std::string FileName;
 	size_t FileSize;
-	long StartPosition{0};
 };
 
 class FileDataCollector
@@ -18,7 +17,6 @@ class FileDataCollector
 private:
 	std::string SourcePath{};
 	ILogWriter &Log;
-	std::set<std::string> ErrorFiles{};
 	std::queue<PendingFile> PendingFiles{};
 	std::queue<std::string> CompletedFiles{};
 	std::queue<std::string> UnprocessedLines{};

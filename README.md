@@ -84,6 +84,7 @@ Download and compile the source:
 cd ~
 git clone https://github.com/ProjectRunspace/xlatnagiosdata.git
 cd xlatnagiosdata
+git submodule update --init
 make all
 ```
 
@@ -122,11 +123,12 @@ Perform these steps to manually install xlatnagiosdata:
 2. Create a directory named ```/etc/xlatnagiosdata```
 3. From the download directory, copy ```./daemon/config/xlatnagiosdatad.toml``` to ```/etc/xlatnagiosdata```
 4. From the download directory, copy ```./daemon/config/xlatnagiosdatad.service``` to ```/etc/systemd/system``` (assuming that this is where your distribution places system service files)
-5. From the download directory, copy ```xlatnagiosdatad``` to ```/usr/local/bin```. You may use an alternative location, but you must edit the service file from #4 to match.
-6. If desired, edit the configuration file from step 3.
-7. Reload system daemons: ```sudo systemctl daemon-reload```
-8. Enable the xlatnagiosdata daemon: ```sudo systemctl enable xlatnagiosdatad``` (this sets the daemon to auto-start, you can save this step for later)
-9. Start the xlatnagiosdata daemon: ```sudo systemctl start xlatnagiosdatad```
+5. Open the file that you just copied to ```etc/systemd/system```. Find the line that reads ```User=root```. If Nagios runs under a different account, change accordingly.
+6. From the download directory, copy ```xlatnagiosdatad``` to ```/usr/local/bin```. You may use an alternative location, but you must edit the service file from #4 to match.
+7. If desired, edit the configuration file from step 3.
+8. Reload system daemons: ```sudo systemctl daemon-reload```
+9. Enable the xlatnagiosdata daemon: ```sudo systemctl enable xlatnagiosdatad``` (this sets the daemon to auto-start, you can save this step for later)
+10. Start the xlatnagiosdata daemon: ```sudo systemctl start xlatnagiosdatad```
 
 At this point, the daemon should be running. Unless you installed over a previous installation, it's probably not getting any data to gather. Skip to the **Post-Installation Setup** section.
 
@@ -173,10 +175,18 @@ After install, you need to do a few things:
 Nagios Core as installed from the Nagios web page installs to ```/usr/local/nagios```. Other repositories and repackaged solutions might use other locations. Under its root install location, Nagios creates a ```/var/spool``` sub-directory. Create an ```xlatnagiosdata``` directory. Example:
 
 ```
-sudo mkdir /usr/local/nagios/xlatnagiosdata
+sudo mkdir /usr/local/nagios/var/spool/xlatnagiosdata
 ```
 
-**Note**: If you use a different location than ```/usr/local/nagios/xlatnagiosdata```, make sure to edit ```/etc/xlatnagiosdata/xlatnagiosdatad.toml``` to change the "spool_directory" key accordingly.
+Since the nagios service commonly runs under an account other than root, and because this service runs as root, you need to make sure that both accounts can access this directory. The easiest way to do this is give this new folder the same ownership as all its peer folders (view with ```ls -la```). Make sure that ```root``` belongs to the same group as the Nagios account. Example:
+
+```
+sudo chown nagios /usr/local/nagios/var/spool/xlatnagiosdata
+sudo chgrp nagcmd /usr/local/nagios/var/spool/xlatnagiosdata
+sudo adduser root nagcmd
+```
+
+**Note**: If you use a different location than ```/usr/local/nagios/var/spool/xlatnagiosdata```, make sure to edit ```/etc/xlatnagiosdata/xlatnagiosdatad.toml``` to change the "spool_directory" key accordingly.
 
 ### 2. Enable Nagios to Write Performance Data
 
@@ -224,12 +234,12 @@ In any .cfg file of your choosing, typically in the ```objects``` directory unde
 ```
 define command {
    command_name process-host-perfdata-xlatnagiosdata
-   command_line mv /usr/local/nagios/var/host-perfdata /var/spool/xlatnagiosdata/$TIMET$.perfdata.host
+   command_line mv /usr/local/nagios/var/host-perfdata /usr/local/nagios/var/spool/xlatnagiosdata/$TIMET$.perfdata.host
 }
 
 define command {
    command_name process-service-perfdata-xlatnagiosdata
-   command_line mv /usr/local/nagios/var/service-perfdata /var/spool/xlatnagiosdata/$TIMET$.perfdata.service
+   command_line mv /usr/local/nagios/var/service-perfdata /usr/local/nagios/var/spool/xlatnagiosdata/$TIMET$.perfdata.service
 }
 ```
 

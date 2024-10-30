@@ -5,8 +5,6 @@
 #include <tuple>
 #include "utility.hpp"
 
-#include <iostream>
-
 class NumberRunner
 {
 protected:

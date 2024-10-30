@@ -39,7 +39,6 @@ int OutputFile::PrepareFile()
 
 void OutputFile::Cleanup()
 {
-	std::mutex CleanupMutex;
 	std::unique_lock TimedLock{CleanupMutex};
 	std::unique_lock WriterLock{WriterMutex, std::defer_lock};
 	while (!CloseTimer.TimedOut() && !CleanupThread.get_stop_token().stop_requested())
