@@ -124,7 +124,7 @@ std::vector<std::string> InfluxTranslator::TranslateNagiosData(const NagiosPerfo
 		LineLength += SetItem(Fields, "crit", PerfData.Crit, true);
 		LineLength += SetItem(Fields, "min", PerfData.Min, true);
 		LineLength += SetItem(Fields, "max", PerfData.Max, true);
-		LineLength += SetItem(Fields, "unit", ConvertFromNagiosUnit(PerfData.Unit, UnitTranslationMap), true);
+		LineLength += SetItem(Tags, "unit", ConvertFromNagiosUnit(PerfData.Unit, UnitTranslationMap), true);
 		TranslatedData.emplace_back(TranslateLine(LineLength));
 	}
 	return TranslatedData;

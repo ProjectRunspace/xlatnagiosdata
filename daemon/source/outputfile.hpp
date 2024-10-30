@@ -23,6 +23,7 @@ private:
 	void Cleanup();
 
 	std::condition_variable CleanupWaitCondition;
+	std::mutex CleanupMutex;
 	std::mutex WriterMutex;
 	ThreadTimer CloseTimer;
 	std::jthread CleanupThread{};

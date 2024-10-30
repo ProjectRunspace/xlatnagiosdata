@@ -1,9 +1,9 @@
-CXXFLAGS = -Wall -Wextra -pedantic -std=c++20 -c -fno-exceptions -fno-rtti
+CXXFLAGS = -Wall -Wextra -pedantic -std=c++20 -c -fno-rtti
 DEBUG ?= 0
 ifeq ($(DEBUG), 1)
-	CXXFLAGS +=-g3 -DDEBUG
+	CXXFLAGS +=-g3 -ggdb -DDEBUG
 else
-	CXXFLAGS +=-g0 -DNDEBUG -O3
+	CXXFLAGS +=-g0 -DNDEBUG -O3 -fno-exceptions
 endif
 
 CXX = g++ $(CXXFLAGS)
@@ -96,7 +96,7 @@ install:
 	systemctl daemon-reload
 	systemctl enable $(DAEMON_EXECUTABLE)
 	systemctl start $(DAEMON_EXECUTABLE)
-	journalctl -u $(DAEMON_EXECUTABLE)
+	journalctl -xeu $(DAEMON_EXECUTABLE) --no-pager
 	@echo
 	@echo Check journalctl output for successful start.
 	@echo Modify main nagios.cfg file:
@@ -109,12 +109,12 @@ install:
 	@echo Create rules in a .cfg file in /usr/local/nagios/etc/objects:
 	@echo "  define command {"
 	@echo "    command_name process-host-perfdata-$(PACKAGE)"
-	@echo "    command_line mv /usr/local/nagios/var/host-perfdata /var/spool/$(PACKAGE)/\$$TIMET\$$.perfdata.host"
+	@echo "    command_line mv /usr/local/nagios/var/host-perfdata /usr/local/nagios/var/spool/$(PACKAGE)/\$$TIMET\$$.perfdata.host"
 	@echo "  }"
 	@echo
 	@echo "  define command {"
 	@echo "    command_name process-service-perfdata-$(PACKAGE)"
-	@echo "    command_line mv /usr/local/nagios/var/service-perfdata /var/spool/$(PACKAGE)/\$$TIMET\$$.perfdata.service"
+	@echo "    command_line mv /usr/local/nagios/var/service-perfdata /usr/local/var/spool/$(PACKAGE)/\$$TIMET\$$.perfdata.service"
 	@echo "  }"
 	@echo
 	@echo To generate data, mark hosts and services as "process_perf_data 1"
@@ -134,6 +134,7 @@ uninstall:
 	-rm $(INSTALL_SERVICE_DIR)$(DAEMON_SERVICE_FILE)
 	-systemctl daemon-reload
 	-rm $(INSTALL_EXECUTABLE_DIR)$(DAEMON_EXECUTABLE)
+	-rm -rf /var/run/$(DAEMON_EXECUTABLE)
 
 tar:
 	@echo $(MAKEFILE_DIRECTORY)
